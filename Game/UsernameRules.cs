@@ -1,10 +1,8 @@
-using System.Text.RegularExpressions;
-
 namespace SnakeGame.Game;
 
 public static class UsernameRules
 {
-    private static readonly Regex Allowed = new(@"^[A-Za-z0-9_ ]+$", RegexOptions.Compiled);
+    private static readonly System.Text.RegularExpressions.Regex Allowed = new(@"^[A-Za-z0-9_ ]+$", System.Text.RegularExpressions.RegexOptions.Compiled);
 
     public static bool TryNormalize(string? raw, out string username, out string error)
     {

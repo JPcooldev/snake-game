@@ -1,6 +1,3 @@
-using Microsoft.Data.Sqlite;
-using SnakeGame.Game;
-
 namespace SnakeGame.Data;
 
 public sealed class GameRepository
@@ -31,22 +28,22 @@ public sealed class GameRepository
             );
             """;
         insert.Parameters.AddWithValue("@player", playerId);
-        insert.Parameters.AddWithValue("@mode", record.Mode.ToDb());
-        insert.Parameters.AddWithValue("@diff", record.Difficulty.ToDb());
+        insert.Parameters.AddWithValue("@mode", SnakeGame.Game.GameModeExtensions.ToDb(record.Mode));
+        insert.Parameters.AddWithValue("@diff", SnakeGame.Game.DifficultyExtensions.ToDb(record.Difficulty));
         insert.Parameters.AddWithValue("@score", record.Score);
         insert.Parameters.AddWithValue("@steps", record.Steps);
         insert.Parameters.AddWithValue("@length", record.Length);
         insert.Parameters.AddWithValue("@duration", (long)record.Duration.TotalMilliseconds);
-        insert.Parameters.AddWithValue("@result", record.Result.ToDb());
+        insert.Parameters.AddWithValue("@result", SnakeGame.Game.GameResultExtensions.ToDb(record.Result));
         insert.Parameters.AddWithValue("@started", record.StartedAt.ToString("O"));
         insert.Parameters.AddWithValue("@ended", record.EndedAt.ToString("O"));
         insert.ExecuteNonQuery();
         tx.Commit();
     }
 
-    public IReadOnlyList<LeaderboardRow> Query(
-        GameMode mode,
-        Difficulty difficulty,
+    public System.Collections.Generic.IReadOnlyList<LeaderboardRow> Query(
+        SnakeGame.Game.GameMode mode,
+        SnakeGame.Game.Difficulty difficulty,
         LeaderboardMetric metric,
         string currentUsername)
     {
@@ -67,8 +64,8 @@ public sealed class GameRepository
     }
 
     private static int GetOrCreatePlayer(
-        SqliteConnection connection,
-        SqliteTransaction tx,
+        Microsoft.Data.Sqlite.SqliteConnection connection,
+        Microsoft.Data.Sqlite.SqliteTransaction tx,
         string username)
     {
         using (var find = connection.CreateCommand())
@@ -89,14 +86,14 @@ public sealed class GameRepository
             SELECT last_insert_rowid();
             """;
         insert.Parameters.AddWithValue("@u", username);
-        insert.Parameters.AddWithValue("@t", DateTimeOffset.UtcNow.ToString("O"));
-        return Convert.ToInt32(insert.ExecuteScalar());
+        insert.Parameters.AddWithValue("@t", System.DateTimeOffset.UtcNow.ToString("O"));
+        return System.Convert.ToInt32(insert.ExecuteScalar());
     }
 
-    private static List<LeaderboardRow> QueryFiltered(
-        SqliteConnection connection,
-        GameMode mode,
-        Difficulty difficulty,
+    private static System.Collections.Generic.List<LeaderboardRow> QueryFiltered(
+        Microsoft.Data.Sqlite.SqliteConnection connection,
+        SnakeGame.Game.GameMode mode,
+        SnakeGame.Game.Difficulty difficulty,
         string orderBy,
         int? minScore = null)
     {
@@ -110,15 +107,15 @@ public sealed class GameRepository
             ORDER BY {orderBy}
             LIMIT 15;
             """;
-        cmd.Parameters.AddWithValue("@mode", mode.ToDb());
-        cmd.Parameters.AddWithValue("@diff", difficulty.ToDb());
+        cmd.Parameters.AddWithValue("@mode", SnakeGame.Game.GameModeExtensions.ToDb(mode));
+        cmd.Parameters.AddWithValue("@diff", SnakeGame.Game.DifficultyExtensions.ToDb(difficulty));
         if (minScore is int score)
             cmd.Parameters.AddWithValue("@minScore", score);
 
         return ReadRows(cmd);
     }
 
-    private static List<LeaderboardRow> QueryPersonalBests(SqliteConnection connection, string username)
+    private static System.Collections.Generic.List<LeaderboardRow> QueryPersonalBests(Microsoft.Data.Sqlite.SqliteConnection connection, string username)
     {
         using var cmd = connection.CreateCommand();
         cmd.CommandText = """
@@ -142,10 +139,10 @@ public sealed class GameRepository
         return ReadRows(cmd, includeModeDifficulty: true);
     }
 
-    private static List<LeaderboardRow> ReadRows(SqliteCommand cmd, bool includeModeDifficulty = false)
+    private static System.Collections.Generic.List<LeaderboardRow> ReadRows(Microsoft.Data.Sqlite.SqliteCommand cmd, bool includeModeDifficulty = false)
     {
         using var reader = cmd.ExecuteReader();
-        var rows = new List<LeaderboardRow>();
+        var rows = new System.Collections.Generic.List<LeaderboardRow>();
         while (reader.Read())
         {
             rows.Add(new LeaderboardRow
@@ -153,12 +150,12 @@ public sealed class GameRepository
                 Username = reader.GetString(0),
                 Mode = includeModeDifficulty ? reader.GetString(1) : null,
                 Difficulty = includeModeDifficulty ? reader.GetString(2) : null,
-                Score = Convert.ToInt32(includeModeDifficulty ? reader.GetValue(3) : reader.GetValue(1)),
-                Steps = Convert.ToInt32(includeModeDifficulty ? reader.GetValue(4) : reader.GetValue(2)),
-                Length = Convert.ToInt32(includeModeDifficulty ? reader.GetValue(5) : reader.GetValue(3)),
-                Duration = TimeSpan.FromMilliseconds(Convert.ToInt64(includeModeDifficulty ? reader.GetValue(6) : reader.GetValue(4))),
+                Score = System.Convert.ToInt32(includeModeDifficulty ? reader.GetValue(3) : reader.GetValue(1)),
+                Steps = System.Convert.ToInt32(includeModeDifficulty ? reader.GetValue(4) : reader.GetValue(2)),
+                Length = System.Convert.ToInt32(includeModeDifficulty ? reader.GetValue(5) : reader.GetValue(3)),
+                Duration = System.TimeSpan.FromMilliseconds(System.Convert.ToInt64(includeModeDifficulty ? reader.GetValue(6) : reader.GetValue(4))),
                 Result = includeModeDifficulty ? reader.GetString(7) : reader.GetString(5),
-                EndedAt = DateTimeOffset.Parse(includeModeDifficulty ? reader.GetString(8) : reader.GetString(6))
+                EndedAt = System.DateTimeOffset.Parse(includeModeDifficulty ? reader.GetString(8) : reader.GetString(6))
             });
         }
 

@@ -1,16 +1,14 @@
-using Microsoft.Data.Sqlite;
-
 namespace SnakeGame.Data;
 
 public static class Database
 {
-    public static SqliteConnection Open(string path)
+    public static Microsoft.Data.Sqlite.SqliteConnection Open(string path)
     {
-        var dir = Path.GetDirectoryName(path);
+        var dir = System.IO.Path.GetDirectoryName(path);
         if (!string.IsNullOrEmpty(dir))
-            Directory.CreateDirectory(dir);
+            System.IO.Directory.CreateDirectory(dir);
 
-        var connection = new SqliteConnection($"Data Source={path}");
+        var connection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={path}");
         connection.Open();
         using var pragma = connection.CreateCommand();
         pragma.CommandText = "PRAGMA foreign_keys = ON;";
@@ -19,7 +17,7 @@ public static class Database
         return connection;
     }
 
-    private static void EnsureSchema(SqliteConnection connection)
+    private static void EnsureSchema(Microsoft.Data.Sqlite.SqliteConnection connection)
     {
         using var cmd = connection.CreateCommand();
         cmd.CommandText = """

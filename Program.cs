@@ -1,17 +1,27 @@
-using Avalonia;
-using System;
-
 namespace SnakeGame;
 
+// sealed class = cannot be inherited
 sealed class Program
 {
-    [STAThread]
-    public static void Main(string[] args) => BuildAvaloniaApp()
-        .StartWithClassicDesktopLifetime(args);
+    // main entry point
+    // STA = Single Threaded Apartment. This is mainly for Windows compatibility.
+    [System.STAThread]
+    public static void Main(string[] args) =>
+        Avalonia.ClassicDesktopStyleApplicationLifetimeExtensions.StartWithClassicDesktopLifetime(
+            BuildAvaloniaApp(), args
+        );
 
-    public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<App>()
-            .UsePlatformDetect()
-            .WithInterFont()
-            .LogToTrace();
+    // build the Avalonia app
+    // - UsePlatformDetect() detects the platform and uses the appropriate Avalonia theme.
+    // - WithInterFont() uses the Inter font for text.
+    // - LogToTrace() logs to the console for debugging.
+    // - Configure<App>() configures the app to use the App class.
+    public static Avalonia.AppBuilder BuildAvaloniaApp()
+        => Avalonia.LoggingExtensions.LogToTrace(
+            Avalonia.AppBuilderExtension.WithInterFont(
+                Avalonia.AppBuilderDesktopExtensions.UsePlatformDetect(
+                    Avalonia.AppBuilder.Configure<App>()
+                )
+            )
+        );
 }

@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace SnakeGame.Data;
 
 public sealed class AppSettings
@@ -13,16 +11,16 @@ public static class SettingsStore
     {
         try
         {
-            if (!File.Exists(AppPaths.SettingsPath))
+            if (!System.IO.File.Exists(AppPaths.SettingsPath))
                 return new AppSettings();
-            var json = File.ReadAllText(AppPaths.SettingsPath);
-            return JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
+            var json = System.IO.File.ReadAllText(AppPaths.SettingsPath);
+            return System.Text.Json.JsonSerializer.Deserialize<AppSettings>(json) ?? new AppSettings();
         }
-        catch (IOException)
+        catch (System.IO.IOException)
         {
             return new AppSettings();
         }
-        catch (JsonException)
+        catch (System.Text.Json.JsonException)
         {
             return new AppSettings();
         }
@@ -30,7 +28,7 @@ public static class SettingsStore
 
     public static void Save(AppSettings settings)
     {
-        var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });
-        File.WriteAllText(AppPaths.SettingsPath, json);
+        var json = System.Text.Json.JsonSerializer.Serialize(settings, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+        System.IO.File.WriteAllText(AppPaths.SettingsPath, json);
     }
 }

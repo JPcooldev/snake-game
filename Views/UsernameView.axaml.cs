@@ -1,11 +1,6 @@
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
-using SnakeGame.Game;
-
 namespace SnakeGame.Views;
 
-public partial class UsernameView : UserControl
+public partial class UsernameView : Avalonia.Controls.UserControl
 {
     private readonly MainWindow _window = null!;
 
@@ -19,17 +14,17 @@ public partial class UsernameView : UserControl
         AttachedToVisualTree += (_, _) => NameBox.Focus();
     }
 
-    private void OnNameKeyDown(object? sender, KeyEventArgs e)
+    private void OnNameKeyDown(object? sender, Avalonia.Input.KeyEventArgs e)
     {
-        if (e.Key == Key.Enter)
+        if (e.Key == Avalonia.Input.Key.Enter)
             Submit();
     }
 
-    private void OnContinue(object? sender, RoutedEventArgs e) => Submit();
+    private void OnContinue(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => Submit();
 
     private void Submit()
     {
-        if (!UsernameRules.TryNormalize(NameBox.Text, out var name, out var error))
+        if (!SnakeGame.Game.UsernameRules.TryNormalize(NameBox.Text, out var name, out var error))
         {
             ErrorText.Text = error;
             ErrorText.IsVisible = true;

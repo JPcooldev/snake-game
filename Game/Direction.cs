@@ -23,6 +23,6 @@ public static class DirectionExtensions
         Direction.Down => new Cell(0, 1),
         Direction.Left => new Cell(-1, 0),
         Direction.Right => new Cell(1, 0),
-        _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
+        _ => throw new System.ArgumentOutOfRangeException(nameof(direction), direction, null)
     };
 }

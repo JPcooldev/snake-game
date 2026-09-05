@@ -1,9 +1,6 @@
-using Avalonia.Controls;
-using Avalonia.Interactivity;
-
 namespace SnakeGame.Views;
 
-public partial class MenuView : UserControl
+public partial class MenuView : Avalonia.Controls.UserControl
 {
     private readonly MainWindow _window = null!;
 
@@ -15,9 +12,9 @@ public partial class MenuView : UserControl
         HelloText.Text = $"Playing as {_window.Session.Username}";
     }
 
-    private void OnPlay(object? sender, RoutedEventArgs e) => _window.ShowPlaySetup();
+    private void OnPlay(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => _window.ShowPlaySetup();
 
-    private void OnLeaderboard(object? sender, RoutedEventArgs e) => _window.ShowLeaderboard();
+    private void OnLeaderboard(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => _window.ShowLeaderboard();
 
-    private void OnChangeUser(object? sender, RoutedEventArgs e) => _window.ShowUsername();
+    private void OnChangeUser(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => _window.ShowUsername();
 }

@@ -21,7 +21,7 @@ public static class GameModeExtensions
     };
 
     public static GameMode ParseDb(string value) =>
-        string.Equals(value, "wrap", StringComparison.OrdinalIgnoreCase)
+        string.Equals(value, "wrap", System.StringComparison.OrdinalIgnoreCase)
             ? GameMode.Wrap
             : GameMode.SolidWalls;
 }

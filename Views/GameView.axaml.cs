@@ -1,68 +1,59 @@
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Interactivity;
-using Avalonia.Media;
-using Avalonia.Threading;
-using SnakeGame.Data;
-using SnakeGame.Game;
-
 namespace SnakeGame.Views;
 
-public partial class GameView : UserControl
+public partial class GameView : Avalonia.Controls.UserControl
 {
-    private static readonly IBrush EmptyBrush = new SolidColorBrush(Color.Parse("#1a1f2b"));
-    private static readonly IBrush HeadBrush = new SolidColorBrush(Color.Parse("#34d399"));
-    private static readonly IBrush BodyBrush = new SolidColorBrush(Color.Parse("#065f46"));
-    private static readonly IBrush FoodBrush = new SolidColorBrush(Color.Parse("#fb7185"));
+    private static readonly Avalonia.Media.IBrush EmptyBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#1a1f2b"));
+    private static readonly Avalonia.Media.IBrush HeadBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#34d399"));
+    private static readonly Avalonia.Media.IBrush BodyBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#065f46"));
+    private static readonly Avalonia.Media.IBrush FoodBrush = new Avalonia.Media.SolidColorBrush(Avalonia.Media.Color.Parse("#fb7185"));
 
     private readonly MainWindow _window = null!;
-    private readonly GameMode _mode = GameMode.SolidWalls;
-    private readonly Difficulty _difficulty = Difficulty.Medium;
-    private readonly Border[,] _cells = new Border[GameState.Size, GameState.Size];
-    private readonly DispatcherTimer _timer = new();
-    private GameState _state = null!;
+    private readonly SnakeGame.Game.GameMode _mode = SnakeGame.Game.GameMode.SolidWalls;
+    private readonly SnakeGame.Game.Difficulty _difficulty = SnakeGame.Game.Difficulty.Medium;
+    private readonly Avalonia.Controls.Border[,] _cells = new Avalonia.Controls.Border[SnakeGame.Game.GameState.Size, SnakeGame.Game.GameState.Size];
+    private readonly Avalonia.Threading.DispatcherTimer _timer = new();
+    private SnakeGame.Game.GameState _state = null!;
     private bool _saved;
 
     public GameView() => InitializeComponent();
 
-    public GameView(MainWindow window, GameMode mode, Difficulty difficulty) : this()
+    public GameView(MainWindow window, SnakeGame.Game.GameMode mode, SnakeGame.Game.Difficulty difficulty) : this()
     {
         _window = window;
         _mode = mode;
         _difficulty = difficulty;
         BuildBoard();
-        _state = new GameState(mode, difficulty);
+        _state = new SnakeGame.Game.GameState(mode, difficulty);
         Focusable = true;
         _timer.Tick += (_, _) => Tick();
         StartRun();
         DetachedFromVisualTree += (_, _) => _timer.Stop();
     }
 
-    public void HandleKey(KeyEventArgs e)
+    public void HandleKey(Avalonia.Input.KeyEventArgs e)
     {
         if (_state.IsOver)
             return;
 
         switch (e.Key)
         {
-            case Key.Up or Key.W:
-                _state.QueueDirection(Direction.Up);
+            case Avalonia.Input.Key.Up or Avalonia.Input.Key.W:
+                _state.QueueDirection(SnakeGame.Game.Direction.Up);
                 e.Handled = true;
                 break;
-            case Key.Down or Key.S:
-                _state.QueueDirection(Direction.Down);
+            case Avalonia.Input.Key.Down or Avalonia.Input.Key.S:
+                _state.QueueDirection(SnakeGame.Game.Direction.Down);
                 e.Handled = true;
                 break;
-            case Key.Left or Key.A:
-                _state.QueueDirection(Direction.Left);
+            case Avalonia.Input.Key.Left or Avalonia.Input.Key.A:
+                _state.QueueDirection(SnakeGame.Game.Direction.Left);
                 e.Handled = true;
                 break;
-            case Key.Right or Key.D:
-                _state.QueueDirection(Direction.Right);
+            case Avalonia.Input.Key.Right or Avalonia.Input.Key.D:
+                _state.QueueDirection(SnakeGame.Game.Direction.Right);
                 e.Handled = true;
                 break;
-            case Key.Space:
+            case Avalonia.Input.Key.Space:
                 TogglePause();
                 e.Handled = true;
                 break;
@@ -72,7 +63,7 @@ public partial class GameView : UserControl
     private void StartRun()
     {
         _saved = false;
-        _timer.Interval = _difficulty.TickInterval();
+        _timer.Interval = SnakeGame.Game.DifficultyExtensions.TickInterval(_difficulty);
         Overlay.IsVisible = false;
         PlayAgainButton.IsVisible = false;
         Render();
@@ -119,8 +110,8 @@ public partial class GameView : UserControl
         SaveIfNeeded();
         OverlayTitle.Text = "Game over";
         OverlayBody.Text =
-            $"{_state.Result!.Value.ToLabel()}\n" +
-            $"Score {_state.Score}  ·  Steps {_state.Steps}  ·  Time {Formatters.Duration(_state.Elapsed)}";
+            $"{SnakeGame.Game.GameResultExtensions.ToLabel(_state.Result!.Value)}\n" +
+            $"Score {_state.Score}  ·  Steps {_state.Steps}  ·  Time {SnakeGame.Data.Formatters.Duration(_state.Elapsed)}";
         PlayAgainButton.IsVisible = true;
         Overlay.IsVisible = true;
     }
@@ -130,7 +121,7 @@ public partial class GameView : UserControl
         if (_saved || _state.Result is null)
             return;
 
-        _window.Repository.Save(new GameRecord
+        _window.Repository.Save(new SnakeGame.Data.GameRecord
         {
             Username = _window.Session.Username,
             Mode = _state.Mode,
@@ -141,18 +132,18 @@ public partial class GameView : UserControl
             Duration = _state.Elapsed,
             Result = _state.Result.Value,
             StartedAt = _state.StartedAt,
-            EndedAt = _state.EndedAt ?? DateTimeOffset.UtcNow
+            EndedAt = _state.EndedAt ?? System.DateTimeOffset.UtcNow
         });
         _saved = true;
     }
 
-    private void OnPlayAgain(object? sender, RoutedEventArgs e)
+    private void OnPlayAgain(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
-        _state = new GameState(_mode, _difficulty);
+        _state = new SnakeGame.Game.GameState(_mode, _difficulty);
         StartRun();
     }
 
-    private void OnMenu(object? sender, RoutedEventArgs e)
+    private void OnMenu(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (!_state.IsOver)
             _state.Quit();
@@ -162,24 +153,24 @@ public partial class GameView : UserControl
 
     private void UpdateHud()
     {
-        TimerText.Text = Formatters.Duration(_state.Elapsed);
-        MetaText.Text = $"{_state.Mode.ToLabel()} · {_state.Difficulty.ToLabel()}";
+        TimerText.Text = SnakeGame.Data.Formatters.Duration(_state.Elapsed);
+        MetaText.Text = $"{SnakeGame.Game.GameModeExtensions.ToLabel(_state.Mode)} · {SnakeGame.Game.DifficultyExtensions.ToLabel(_state.Difficulty)}";
         ScoreText.Text = $"{_window.Session.Username}   {_state.Score}";
     }
 
     private void BuildBoard()
     {
-        Board.Rows = GameState.Size;
-        Board.Columns = GameState.Size;
+        Board.Rows = SnakeGame.Game.GameState.Size;
+        Board.Columns = SnakeGame.Game.GameState.Size;
         Board.Children.Clear();
-        for (var y = 0; y < GameState.Size; y++)
+        for (var y = 0; y < SnakeGame.Game.GameState.Size; y++)
         {
-            for (var x = 0; x < GameState.Size; x++)
+            for (var x = 0; x < SnakeGame.Game.GameState.Size; x++)
             {
-                var cell = new Border
+                var cell = new Avalonia.Controls.Border
                 {
-                    Margin = new Thickness(1),
-                    CornerRadius = new CornerRadius(3),
+                    Margin = new Avalonia.Thickness(1),
+                    CornerRadius = new Avalonia.CornerRadius(3),
                     Background = EmptyBrush
                 };
                 _cells[x, y] = cell;
@@ -190,9 +181,9 @@ public partial class GameView : UserControl
 
     private void Render()
     {
-        for (var y = 0; y < GameState.Size; y++)
+        for (var y = 0; y < SnakeGame.Game.GameState.Size; y++)
         {
-            for (var x = 0; x < GameState.Size; x++)
+            for (var x = 0; x < SnakeGame.Game.GameState.Size; x++)
                 _cells[x, y].Background = EmptyBrush;
         }
 

@@ -6,3 +6,4 @@ obj/
 *.db-shm
 settings.json
 .DS_Store
+notes/

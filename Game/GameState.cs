@@ -1,17 +1,15 @@
-using System.Diagnostics;
-
 namespace SnakeGame.Game;
 
 public sealed class GameState
 {
     public const int Size = 20;
 
-    private readonly LinkedList<Cell> _snake = new();
-    private readonly Queue<Direction> _input = new();
-    private readonly Random _rng;
-    private readonly Stopwatch _watch = new();
+    private readonly System.Collections.Generic.LinkedList<Cell> _snake = new();
+    private readonly System.Collections.Generic.Queue<Direction> _input = new();
+    private readonly System.Random _rng;
+    private readonly System.Diagnostics.Stopwatch _watch = new();
 
-    public GameState(GameMode mode, Difficulty difficulty, Random? rng = null)
+    public GameState(GameMode mode, Difficulty difficulty, System.Random? rng = null)
         : this(mode, difficulty, rng, DefaultBody(), Direction.Right)
     {
         TrySpawnFood();
@@ -21,18 +19,18 @@ public sealed class GameState
     private GameState(
         GameMode mode,
         Difficulty difficulty,
-        Random? rng,
-        IReadOnlyList<Cell> bodyHeadFirst,
+        System.Random? rng,
+        System.Collections.Generic.IReadOnlyList<Cell> bodyHeadFirst,
         Direction direction)
     {
         if (bodyHeadFirst.Count == 0)
-            throw new ArgumentException("Snake must have at least one cell.", nameof(bodyHeadFirst));
+            throw new System.ArgumentException("Snake must have at least one cell.", nameof(bodyHeadFirst));
 
         Mode = mode;
         Difficulty = difficulty;
-        _rng = rng ?? Random.Shared;
+        _rng = rng ?? System.Random.Shared;
         CurrentDirection = direction;
-        StartedAt = DateTimeOffset.UtcNow;
+        StartedAt = System.DateTimeOffset.UtcNow;
         foreach (var cell in bodyHeadFirst)
             _snake.AddLast(cell);
     }
@@ -47,20 +45,20 @@ public sealed class GameState
     public bool IsPaused { get; private set; }
     public bool IsOver => Result is not null;
     public GameResult? Result { get; private set; }
-    public DateTimeOffset StartedAt { get; }
-    public DateTimeOffset? EndedAt { get; private set; }
-    public TimeSpan Elapsed => _watch.Elapsed;
+    public System.DateTimeOffset StartedAt { get; }
+    public System.DateTimeOffset? EndedAt { get; private set; }
+    public System.TimeSpan Elapsed => _watch.Elapsed;
     public Cell Head => _snake.First!.Value;
-    public IReadOnlyCollection<Cell> Snake => _snake;
+    public System.Collections.Generic.IReadOnlyCollection<Cell> Snake => _snake;
 
     public static GameState CreateForTests(
         GameMode mode,
-        IReadOnlyList<Cell> bodyHeadFirst,
+        System.Collections.Generic.IReadOnlyList<Cell> bodyHeadFirst,
         Direction direction,
         Cell? food,
         Difficulty difficulty = Difficulty.Easy)
     {
-        var state = new GameState(mode, difficulty, new Random(1), bodyHeadFirst, direction)
+        var state = new GameState(mode, difficulty, new System.Random(1), bodyHeadFirst, direction)
         {
             Food = food
         };
@@ -73,7 +71,7 @@ public sealed class GameState
         if (IsOver)
             return;
 
-        var last = _input.Count > 0 ? _input.Last() : CurrentDirection;
+        var last = _input.Count > 0 ? System.Linq.Enumerable.Last(_input) : CurrentDirection;
         if (direction == last)
             return;
         if (_snake.Count > 1 && direction.IsOpposite(last))
@@ -164,7 +162,7 @@ public sealed class GameState
     public void PlaceFood(Cell cell)
     {
         if (cell.X < 0 || cell.X >= Size || cell.Y < 0 || cell.Y >= Size)
-            throw new ArgumentOutOfRangeException(nameof(cell));
+            throw new System.ArgumentOutOfRangeException(nameof(cell));
         Food = cell;
     }
 
@@ -181,10 +179,10 @@ public sealed class GameState
         return true;
     }
 
-    private List<Cell> EmptyCells()
+    private System.Collections.Generic.List<Cell> EmptyCells()
     {
-        var occupied = new HashSet<Cell>(_snake);
-        var empty = new List<Cell>(Size * Size - occupied.Count);
+        var occupied = new System.Collections.Generic.HashSet<Cell>(_snake);
+        var empty = new System.Collections.Generic.List<Cell>(Size * Size - occupied.Count);
         for (var y = 0; y < Size; y++)
         {
             for (var x = 0; x < Size; x++)
@@ -205,10 +203,10 @@ public sealed class GameState
         Result = result;
         IsPaused = false;
         _watch.Stop();
-        EndedAt = DateTimeOffset.UtcNow;
+        EndedAt = System.DateTimeOffset.UtcNow;
     }
 
-    private static List<Cell> DefaultBody()
+    private static System.Collections.Generic.List<Cell> DefaultBody()
     {
         // Head at the centre, facing right, length 3.
         const int cx = Size / 2;

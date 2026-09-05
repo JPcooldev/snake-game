@@ -6,12 +6,12 @@ public static class AppPaths
     {
         get
         {
-            var dir = Path.Combine(AppContext.BaseDirectory, "data");
-            Directory.CreateDirectory(dir);
+            var dir = System.IO.Path.Combine(System.AppContext.BaseDirectory, "data");
+            System.IO.Directory.CreateDirectory(dir);
             return dir;
         }
     }
 
-    public static string DbPath => Path.Combine(DataDirectory, "snake.db");
-    public static string SettingsPath => Path.Combine(DataDirectory, "settings.json");
+    public static string DbPath => System.IO.Path.Combine(DataDirectory, "snake.db");
+    public static string SettingsPath => System.IO.Path.Combine(DataDirectory, "settings.json");
 }

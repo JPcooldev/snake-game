@@ -9,11 +9,11 @@ public enum Difficulty
 
 public static class DifficultyExtensions
 {
-    public static TimeSpan TickInterval(this Difficulty difficulty) => difficulty switch
+    public static System.TimeSpan TickInterval(this Difficulty difficulty) => difficulty switch
     {
-        Difficulty.Easy => TimeSpan.FromMilliseconds(180),
-        Difficulty.Hard => TimeSpan.FromMilliseconds(70),
-        _ => TimeSpan.FromMilliseconds(110)
+        Difficulty.Easy => System.TimeSpan.FromMilliseconds(180),
+        Difficulty.Hard => System.TimeSpan.FromMilliseconds(70),
+        _ => System.TimeSpan.FromMilliseconds(110)
     };
 
     public static string ToDb(this Difficulty difficulty) => difficulty.ToString().ToLowerInvariant();
