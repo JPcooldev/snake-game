@@ -1,0 +1,9 @@
+bin/
+obj/
+*.user
+*.db
+*.db-wal
+*.db-shm
+settings.json
+.DS_Store
+data/

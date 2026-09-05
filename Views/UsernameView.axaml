@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="SnakeGame.Views.UsernameView">
+    <Grid>
+        <StackPanel Width="360"
+                    Spacing="14"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center">
+            <TextBlock Classes="title" Text="Snake" HorizontalAlignment="Center"/>
+            <TextBlock Classes="muted"
+                       Text="Enter a username to keep scores and leaderboards."
+                       TextWrapping="Wrap"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center"/>
+            <TextBox x:Name="NameBox"
+                     Watermark="username"
+                     MaxLength="16"/>
+            <TextBlock x:Name="ErrorText"
+                       Foreground="#fb7185"
+                       IsVisible="False"
+                       TextWrapping="Wrap"/>
+            <Button Classes="primary"
+                    Content="Continue"
+                    Click="OnContinue"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

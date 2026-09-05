@@ -1,0 +1,49 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="SnakeGame.Views.LeaderboardView">
+    <DockPanel Margin="24">
+        <StackPanel DockPanel.Dock="Top" Spacing="12">
+            <TextBlock Classes="title" Text="Leaderboard"/>
+            <TextBlock Classes="muted"
+                       Text="Scores are split by wall mode and difficulty so runs stay comparable."
+                       TextWrapping="Wrap"/>
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <StackPanel Spacing="4" Width="180">
+                    <TextBlock Text="Mode" Classes="muted"/>
+                    <ComboBox x:Name="ModeBox" SelectionChanged="OnFilterChanged"/>
+                </StackPanel>
+                <StackPanel Spacing="4" Width="180">
+                    <TextBlock Text="Difficulty" Classes="muted"/>
+                    <ComboBox x:Name="DifficultyBox" SelectionChanged="OnFilterChanged"/>
+                </StackPanel>
+                <StackPanel Spacing="4" Width="260">
+                    <TextBlock Text="Board" Classes="muted"/>
+                    <ComboBox x:Name="MetricBox" SelectionChanged="OnFilterChanged"/>
+                </StackPanel>
+            </StackPanel>
+            <TextBlock x:Name="CaptionText" Classes="muted" TextWrapping="Wrap"/>
+            <Grid ColumnDefinitions="40,*,70,70,70,70,90,150" Margin="0,8,0,0">
+                <TextBlock Text="#" Classes="muted"/>
+                <TextBlock Grid.Column="1" x:Name="PlayerHeader" Text="Player" Classes="muted"/>
+                <TextBlock Grid.Column="2" Text="Score" Classes="muted"/>
+                <TextBlock Grid.Column="3" Text="Steps" Classes="muted"/>
+                <TextBlock Grid.Column="4" Text="Length" Classes="muted"/>
+                <TextBlock Grid.Column="5" Text="Time" Classes="muted"/>
+                <TextBlock Grid.Column="6" Text="Result" Classes="muted"/>
+                <TextBlock Grid.Column="7" Text="When" Classes="muted"/>
+            </Grid>
+        </StackPanel>
+
+        <Button DockPanel.Dock="Bottom"
+                Classes="secondary"
+                Content="Back"
+                Margin="0,16,0,0"
+                HorizontalAlignment="Left"
+                Width="160"
+                Click="OnBack"/>
+
+        <ScrollViewer Margin="0,8,0,0">
+            <StackPanel x:Name="Rows"/>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

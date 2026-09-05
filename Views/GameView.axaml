@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="SnakeGame.Views.GameView">
+    <Grid Margin="20" RowDefinitions="Auto,*,Auto">
+        <Grid Grid.Row="0" ColumnDefinitions="*,*,*" Margin="0,0,0,12">
+            <TextBlock x:Name="TimerText"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       VerticalAlignment="Center"/>
+            <TextBlock x:Name="MetaText"
+                       Grid.Column="1"
+                       Classes="muted"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+            <TextBlock x:Name="ScoreText"
+                       Grid.Column="2"
+                       FontSize="18"
+                       FontWeight="SemiBold"
+                       HorizontalAlignment="Right"
+                       VerticalAlignment="Center"/>
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Border Background="#11141c"
+                    CornerRadius="10"
+                    Padding="8">
+                <Viewbox Stretch="Uniform">
+                    <UniformGrid x:Name="Board"
+                                 Width="560"
+                                 Height="560"/>
+                </Viewbox>
+            </Border>
+
+            <Border x:Name="Overlay"
+                    Background="#CC0f1115"
+                    CornerRadius="10"
+                    IsVisible="False">
+                <StackPanel Width="360"
+                            Spacing="10"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                    <TextBlock x:Name="OverlayTitle"
+                               Classes="title"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"/>
+                    <TextBlock x:Name="OverlayBody"
+                               Classes="muted"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               HorizontalAlignment="Center"/>
+                    <Button x:Name="PlayAgainButton"
+                            Classes="primary"
+                            Content="Play again"
+                            Click="OnPlayAgain"
+                            IsVisible="False"/>
+                    <Button Classes="secondary"
+                            Content="Menu"
+                            Click="OnMenu"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <TextBlock Grid.Row="2"
+                   Classes="muted"
+                   Margin="0,12,0,0"
+                   HorizontalAlignment="Center"
+                   Text="Arrows or WASD to move · Space to pause · Menu saves the run as quit"/>
+    </Grid>
+</UserControl>
