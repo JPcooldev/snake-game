@@ -5,6 +5,7 @@ public static class Database
     public static Microsoft.Data.Sqlite.SqliteConnection Open(string path)
     {
         var dir = System.IO.Path.GetDirectoryName(path);
+        // create a directory for sqlite database if it doesn't exist
         if (!string.IsNullOrEmpty(dir))
             System.IO.Directory.CreateDirectory(dir);
 
