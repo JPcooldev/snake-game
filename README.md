@@ -51,14 +51,15 @@ This project uses:
 
 ## How to run
 
-From this folder:
+Clone the repo, then run from its root:
 
 ```bash
+git clone https://github.com/JPcooldev/snake-game.git
 cd snake-game
-dotnet run
+dotnet run --project SnakeGame
 ```
 
-The first run restores packages, then opens the window. Enter a username, then **Play game** or **Leaderboard**.
+You need Git and the **.NET 8 SDK** (see Requirements). The first run restores packages, then opens the window. Enter a username, then **Play game** or **Leaderboard**.
 
 Build without running:
 
@@ -66,7 +67,7 @@ Build without running:
 dotnet build
 ```
 
-The compiled app is `bin/Debug/net8.0/SnakeGame`.
+The compiled app is `SnakeGame/bin/Debug/net8.0/SnakeGame`.
 
 ## Controls
 
@@ -99,14 +100,14 @@ That builds the app and the test project, then runs **xUnit** tests covering:
 - username validation
 - saving a run and querying a leaderboard
 
-There are no UI tests. Game rules live in `Game/GameState.cs` with no Avalonia types, so they can be tested without opening a window.
+There are no UI tests. Game rules live in `SnakeGame/Game/GameState.cs` with no Avalonia types, so they can be tested without opening a window.
 
 ## Database
 
 SQLite file (created on first launch):
 
 ```text
-bin/Debug/net8.0/data/snake.db
+SnakeGame/bin/Debug/net8.0/data/snake.db
 ```
 
 Last username is stored next to it in `settings.json`.
@@ -117,11 +118,13 @@ The schema is created automatically (`CREATE TABLE IF NOT EXISTS`). One row is i
 
 ```text
 snake-game/
-  Game/           rules (grid, movement, pause) — no UI
-  Data/           SQLite schema, save, leaderboard queries
-  Views/          username, menu, setup, board, leaderboard
-  img/            README screenshots
-  SnakeGame.Tests xUnit tests
+  SnakeGame.sln
+  SnakeGame/              app
+    Game/                 rules (grid, movement, pause) — no UI
+    Data/                 SQLite schema, save, leaderboard queries
+    Views/                username, menu, setup, board, leaderboard
+  SnakeGame.Tests/        xUnit tests
+  img/                    README screenshots
 ```
 
 Everything runs on the **UI thread**. A `DispatcherTimer` ticks the snake; there is no extra thread for game logic.
