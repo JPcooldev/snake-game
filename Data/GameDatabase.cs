@@ -1,18 +1,21 @@
 namespace SnakeGame.Data;
 
-public sealed class GameRepository
+// Opens the SQLite file, ensures the schema exists, and saves/queries game records.
+
+public sealed class GameDatabase
 {
     private readonly string _dbPath;
 
-    public GameRepository(string dbPath)
+    public GameDatabase(string dbPath)
     {
         _dbPath = dbPath;
-        using var connection = Database.Open(_dbPath);
+        using var connection = Open();
     }
 
+    // saves a game record to the database
     public void Save(GameRecord record)
     {
-        using var connection = Database.Open(_dbPath);
+        using var connection = Open();
         using var tx = connection.BeginTransaction();
         var playerId = GetOrCreatePlayer(connection, tx, record.Username);
 
@@ -41,13 +44,14 @@ public sealed class GameRepository
         tx.Commit();
     }
 
+    // queries the leaderboard for a given mode, difficulty, and metric
     public System.Collections.Generic.IReadOnlyList<LeaderboardRow> Query(
         SnakeGame.Game.GameMode mode,
         SnakeGame.Game.Difficulty difficulty,
         LeaderboardMetric metric,
         string currentUsername)
     {
-        using var connection = Database.Open(_dbPath);
+        using var connection = Open();
         return metric switch
         {
             LeaderboardMetric.HighestScore => QueryFiltered(
@@ -56,13 +60,56 @@ public sealed class GameRepository
                 connection, mode, difficulty, "duration_ms DESC, score DESC"),
             LeaderboardMetric.LongestSnake => QueryFiltered(
                 connection, mode, difficulty, "length DESC, steps ASC"),
-            LeaderboardMetric.FewestTicksToTen => QueryFiltered(
-                connection, mode, difficulty, "steps ASC, duration_ms ASC", minScore: 10),
             LeaderboardMetric.PersonalBests => QueryPersonalBests(connection, currentUsername),
             _ => []
         };
     }
 
+    // opens a connection to the database
+    private Microsoft.Data.Sqlite.SqliteConnection Open()
+    {
+        var dir = System.IO.Path.GetDirectoryName(_dbPath);
+        if (!string.IsNullOrEmpty(dir))
+            System.IO.Directory.CreateDirectory(dir);
+
+        var connection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={_dbPath}");
+        connection.Open();
+        using var pragma = connection.CreateCommand();
+        pragma.CommandText = "PRAGMA foreign_keys = ON;";
+        pragma.ExecuteNonQuery();
+        EnsureSchema(connection);
+        return connection;
+    }
+
+    // ensures the schema is created
+    private static void EnsureSchema(Microsoft.Data.Sqlite.SqliteConnection connection)
+    {
+        using var cmd = connection.CreateCommand();
+        cmd.CommandText = """
+            CREATE TABLE IF NOT EXISTS players (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              username TEXT NOT NULL COLLATE NOCASE UNIQUE,
+              created_at TEXT NOT NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS games (
+              id INTEGER PRIMARY KEY AUTOINCREMENT,
+              player_id INTEGER NOT NULL REFERENCES players(id),
+              mode TEXT NOT NULL,
+              difficulty TEXT NOT NULL,
+              score INTEGER NOT NULL,
+              steps INTEGER NOT NULL,
+              length INTEGER NOT NULL,
+              duration_ms INTEGER NOT NULL,
+              result TEXT NOT NULL,
+              started_at TEXT NOT NULL,
+              ended_at TEXT NOT NULL
+            );
+            """;
+        cmd.ExecuteNonQuery();
+    }
+
+    // gets or creates a player in the database and returns the player id
     private static int GetOrCreatePlayer(
         Microsoft.Data.Sqlite.SqliteConnection connection,
         Microsoft.Data.Sqlite.SqliteTransaction tx,
@@ -90,12 +137,13 @@ public sealed class GameRepository
         return System.Convert.ToInt32(insert.ExecuteScalar());
     }
 
+    // queries the leaderboard for a given mode, difficulty, and metric
+    // returns top 15 rows based on the order by clause
     private static System.Collections.Generic.List<LeaderboardRow> QueryFiltered(
         Microsoft.Data.Sqlite.SqliteConnection connection,
         SnakeGame.Game.GameMode mode,
         SnakeGame.Game.Difficulty difficulty,
-        string orderBy,
-        int? minScore = null)
+        string orderBy)
     {
         using var cmd = connection.CreateCommand();
         cmd.CommandText = $"""
@@ -103,19 +151,19 @@ public sealed class GameRepository
             FROM games g
             JOIN players p ON p.id = g.player_id
             WHERE g.mode = @mode AND g.difficulty = @diff
-              {(minScore is int min ? "AND g.score >= @minScore" : "")}
             ORDER BY {orderBy}
             LIMIT 15;
             """;
         cmd.Parameters.AddWithValue("@mode", SnakeGame.Game.GameModeExtensions.ToDb(mode));
         cmd.Parameters.AddWithValue("@diff", SnakeGame.Game.DifficultyExtensions.ToDb(difficulty));
-        if (minScore is int score)
-            cmd.Parameters.AddWithValue("@minScore", score);
 
         return ReadRows(cmd);
     }
 
-    private static System.Collections.Generic.List<LeaderboardRow> QueryPersonalBests(Microsoft.Data.Sqlite.SqliteConnection connection, string username)
+    // queries the personal bests for a given username
+    private static System.Collections.Generic.List<LeaderboardRow> QueryPersonalBests(
+        Microsoft.Data.Sqlite.SqliteConnection connection,
+        string username)
     {
         using var cmd = connection.CreateCommand();
         cmd.CommandText = """
@@ -139,7 +187,11 @@ public sealed class GameRepository
         return ReadRows(cmd, includeModeDifficulty: true);
     }
 
-    private static System.Collections.Generic.List<LeaderboardRow> ReadRows(Microsoft.Data.Sqlite.SqliteCommand cmd, bool includeModeDifficulty = false)
+    // read the database and create a list of LeaderboardRow objects
+    // includeModeDifficulty is used to include the mode and difficulty in the result (for personal bests)
+    private static System.Collections.Generic.List<LeaderboardRow> ReadRows(
+        Microsoft.Data.Sqlite.SqliteCommand cmd,
+        bool includeModeDifficulty = false)
     {
         using var reader = cmd.ExecuteReader();
         var rows = new System.Collections.Generic.List<LeaderboardRow>();

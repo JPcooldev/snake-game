@@ -2,6 +2,13 @@
 
 A desktop Snake game with two wall modes, three speeds, pause, and SQLite leaderboards.
 
+
+|                           |                                           |                                     |
+| ------------------------- | ----------------------------------------- | ----------------------------------- |
+| ![Gameplay](img/game.png) | ![New game options](img/game-options.png) | ![Leaderboard](img/leaderboard.png) |
+| Gameplay                  | New game                                  | Leaderboard                         |
+
+
 You play on a **20×20** grid. There is always **one apple**. Eating it grows the snake and places the next apple on a random empty cell. Runs are saved when they end (death, win, or quit), not on every move.
 
 ## Features
@@ -15,7 +22,6 @@ You play on a **20×20** grid. There is always **one apple**. Eating it grows th
   - highest score
   - longest survival time
   - longest snake
-  - fewest ticks among runs that reached score ≥ 10
   - personal bests for the current user
 
 Score is apples eaten. **Steps** are ticks the snake actually moved, not keypresses.
@@ -32,12 +38,16 @@ It should print a version starting with `8.`. If `dotnet` is missing, install th
 
 This project uses:
 
-| Piece | Why |
-|---|---|
-| C# / .NET 8 | language and runtime |
-| Avalonia 11 | desktop GUI |
-| Microsoft.Data.Sqlite | local leaderboard database |
-| xUnit | unit tests for game rules and SQLite |
+
+| Piece                 | Why                                  |
+| --------------------- | ------------------------------------ |
+| C# / .NET 8           | language and runtime                 |
+| Avalonia 11           | desktop GUI                          |
+| Microsoft.Data.Sqlite | local leaderboard database           |
+| xUnit                 | unit tests for game rules and SQLite |
+
+
+
 
 ## How to run
 
@@ -60,11 +70,13 @@ The compiled app is `bin/Debug/net8.0/SnakeGame`.
 
 ## Controls
 
-| Key | Action |
-|---|---|
-| Arrow keys or WASD | turn |
-| Space | pause / resume |
-| Menu button | leave the run (saved as quit) |
+
+| Key                | Action                        |
+| ------------------ | ----------------------------- |
+| Arrow keys or WASD | turn                          |
+| Space              | pause / resume                |
+| Menu button        | leave the run (saved as quit) |
+
 
 You cannot reverse 180° into your own body. Up to two upcoming turns are buffered so corner turns feel responsive.
 
@@ -101,8 +113,6 @@ Last username is stored next to it in `settings.json`.
 
 The schema is created automatically (`CREATE TABLE IF NOT EXISTS`). One row is inserted per finished run: username, mode, difficulty, score, steps, length, duration, result, timestamps. Individual moves are **not** logged.
 
-The database is **user data**, not source. `*.db` and `settings.json` are gitignored. Do not commit them.
-
 ## Project layout
 
 ```text
@@ -110,11 +120,8 @@ snake-game/
   Game/           rules (grid, movement, pause) — no UI
   Data/           SQLite schema, save, leaderboard queries
   Views/          username, menu, setup, board, leaderboard
+  img/            README screenshots
   SnakeGame.Tests xUnit tests
 ```
 
 Everything runs on the **UI thread**. A `DispatcherTimer` ticks the snake; there is no extra thread for game logic.
-
-## Git
-
-This folder is its own git repository. Commit source only. After you play, `git status` should not show `snake.db`.

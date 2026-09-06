@@ -1,5 +1,8 @@
 namespace SnakeGame;
 
+// This class represents the application
+// It is used to initialize the app and display the main window
+
 public partial class App : Avalonia.Application
 {
     // initialize the app (overload of Avalonia.Application.Initialize())

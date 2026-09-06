@@ -1,5 +1,10 @@
 namespace SnakeGame.Game;
 
+// This enum represents the game mode and its methods (used to save to database)
+
+// game modes
+// - SolidWalls: The snake hits the walls and dies
+// - Wrap: The snake wraps around the edges of the board
 public enum GameMode
 {
     SolidWalls,

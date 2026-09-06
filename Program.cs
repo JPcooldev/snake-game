@@ -1,5 +1,8 @@
 namespace SnakeGame;
 
+// This class represents the program
+// It is used to start the app and build the Avalonia app
+
 // sealed class = cannot be inherited
 sealed class Program
 {

@@ -1,5 +1,7 @@
 namespace SnakeGame.Data;
 
+// This class provides the paths to the data directory and the database file
+
 public static class AppPaths
 {
     public static string DataDirectory

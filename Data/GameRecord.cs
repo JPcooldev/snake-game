@@ -1,5 +1,20 @@
 namespace SnakeGame.Data;
 
+// This class represents a record of a game
+// It is used to store the game information in the database
+
+// GameRecord is defined by the following properties:
+// - Username: the username of the player who played the game
+// - Mode: the game mode (SolidWalls or Wrap)
+// - Difficulty: the difficulty of the game (Easy, Medium, Hard)
+// - Score: the score of the game (number of food eaten)
+// - Steps: the number of steps taken (number of ticks)
+// - Length: the length of the snake
+// - Duration: the duration of the game
+// - Result: the result of the game (HitWall, HitSelf, Won, Quit)
+// - StartedAt: the timestamp when the game started
+// - EndedAt: the timestamp when the game ended
+
 public sealed class GameRecord
 {
     public required string Username { get; init; }
@@ -14,6 +29,17 @@ public sealed class GameRecord
     public System.DateTimeOffset EndedAt { get; init; }
 }
 
+// LeaderboardRow is defined by the following properties:
+// - Username: the username of the player who played the game
+// - Score: the score of the game (number of food eaten)
+// - Steps: the number of steps taken (number of ticks)
+// - Length: the length of the snake
+// - Duration: the duration of the game
+// - Result: the result of the game (HitWall, HitSelf, Won, Quit)
+// - EndedAt: the timestamp when the game ended
+// - Mode: the game mode (SolidWalls or Wrap)
+// - Difficulty: the difficulty of the game (Easy, Medium, Hard)
+
 public sealed class LeaderboardRow
 {
     public required string Username { get; init; }
@@ -27,11 +53,15 @@ public sealed class LeaderboardRow
     public string? Difficulty { get; init; }
 }
 
+// We can display different metrics on the leaderboard
+// - HighestScore: the highest score
+// - LongestTime: the longest time
+// - LongestSnake: the longest snake
+// - PersonalBests: the personal bests for the current user
 public enum LeaderboardMetric
 {
     HighestScore,
     LongestTime,
     LongestSnake,
-    FewestTicksToTen,
     PersonalBests
 }

@@ -1,5 +1,7 @@
 namespace SnakeGame.Game;
 
+// This enum represents the difficulty of the game and its methods
+
 public enum Difficulty
 {
     Easy,
@@ -9,6 +11,10 @@ public enum Difficulty
 
 public static class DifficultyExtensions
 {
+    // tick interval (milliseconds) based on difficulty
+    // Easy:   180ms
+    // Medium: 110ms
+    // Hard:    70ms
     public static System.TimeSpan TickInterval(this Difficulty difficulty) => difficulty switch
     {
         Difficulty.Easy => System.TimeSpan.FromMilliseconds(180),

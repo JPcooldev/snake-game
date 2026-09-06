@@ -1,5 +1,8 @@
 namespace SnakeGame.Views;
 
+// This class represents the leaderboard view of the application
+// It is used to display the leaderboard options and rows
+
 public partial class LeaderboardView : Avalonia.Controls.UserControl
 {
     private readonly MainWindow _window = null!;
@@ -11,6 +14,7 @@ public partial class LeaderboardView : Avalonia.Controls.UserControl
     {
         _window = window;
 
+        // show the mode, difficulty, and metric options
         ModeBox.ItemsSource = new[] { "Solid walls", "Wrap around" };
         DifficultyBox.ItemsSource = new[] { "Easy", "Medium", "Hard" };
         MetricBox.ItemsSource = new[]
@@ -18,7 +22,6 @@ public partial class LeaderboardView : Avalonia.Controls.UserControl
             "Highest score",
             "Longest survival time",
             "Longest snake",
-            "Fewest ticks to score 10",
             "My personal bests"
         };
 
@@ -34,14 +37,18 @@ public partial class LeaderboardView : Avalonia.Controls.UserControl
         Refresh();
     }
 
+    // handle the filter changed event
     private void OnFilterChanged(object? sender, Avalonia.Controls.SelectionChangedEventArgs e)
     {
         if (_ready)
             Refresh();
     }
 
+    // handle the back button click
     private void OnBack(object? sender, Avalonia.Interactivity.RoutedEventArgs e) => _window.ShowMenu();
 
+    // refresh the leaderboard
+    // get the selected mode, difficulty, and metric
     private void Refresh()
     {
         var mode = ModeBox.SelectedIndex == 1 ? SnakeGame.Game.GameMode.Wrap : SnakeGame.Game.GameMode.SolidWalls;
@@ -55,8 +62,7 @@ public partial class LeaderboardView : Avalonia.Controls.UserControl
         {
             1 => SnakeGame.Data.LeaderboardMetric.LongestTime,
             2 => SnakeGame.Data.LeaderboardMetric.LongestSnake,
-            3 => SnakeGame.Data.LeaderboardMetric.FewestTicksToTen,
-            4 => SnakeGame.Data.LeaderboardMetric.PersonalBests,
+            3 => SnakeGame.Data.LeaderboardMetric.PersonalBests,
             _ => SnakeGame.Data.LeaderboardMetric.HighestScore
         };
 
@@ -64,16 +70,17 @@ public partial class LeaderboardView : Avalonia.Controls.UserControl
         PlayerHeader.Text = personal ? "Mode / difficulty" : "Player";
         CaptionText.Text = metric switch
         {
-            SnakeGame.Data.LeaderboardMetric.FewestTicksToTen =>
-                "Runs that reached at least 10 points, ranked by fewest snake ticks.",
             SnakeGame.Data.LeaderboardMetric.PersonalBests =>
                 $"Best score for {_window.Session.Username} in each mode × difficulty.",
             _ => $"{MetricLabel(metric)} · {SnakeGame.Game.GameModeExtensions.ToLabel(mode)} · {SnakeGame.Game.DifficultyExtensions.ToLabel(difficulty)}"
         };
 
-        var rows = _window.Repository.Query(mode, difficulty, metric, _window.Session.Username);
+        // get the leaderboard rows
+        var rows = _window.Database.Query(mode, difficulty, metric, _window.Session.Username);
+        // clear the rows
         Rows.Children.Clear();
 
+        // if there are no rows, show a message
         if (rows.Count == 0)
         {
             Rows.Children.Add(new Avalonia.Controls.TextBlock
@@ -85,6 +92,7 @@ public partial class LeaderboardView : Avalonia.Controls.UserControl
             return;
         }
 
+        // add the game runs rows to the grid
         for (var i = 0; i < rows.Count; i++)
         {
             var row = rows[i];
@@ -105,6 +113,7 @@ public partial class LeaderboardView : Avalonia.Controls.UserControl
         }
     }
 
+    // add a cell to the grid
     private static void AddCell(Avalonia.Controls.Grid grid, int column, string text)
     {
         var block = new Avalonia.Controls.TextBlock
@@ -117,11 +126,11 @@ public partial class LeaderboardView : Avalonia.Controls.UserControl
         grid.Children.Add(block);
     }
 
+    // get the metric label
     private static string MetricLabel(SnakeGame.Data.LeaderboardMetric metric) => metric switch
     {
         SnakeGame.Data.LeaderboardMetric.LongestTime => "Longest survival time",
         SnakeGame.Data.LeaderboardMetric.LongestSnake => "Longest snake",
-        SnakeGame.Data.LeaderboardMetric.FewestTicksToTen => "Fewest ticks to score 10",
         SnakeGame.Data.LeaderboardMetric.PersonalBests => "Personal bests",
         _ => "Highest score"
     };

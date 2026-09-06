@@ -1,5 +1,12 @@
 namespace SnakeGame.Game;
 
+// This enum represents the result of a game and its methods (used to save to database)
+
+// game results
+// - HitWall: The snake hit a wall and died
+// - HitSelf: The snake hit itself and died
+// - Won: The snake filled the whole working area board
+// - Quit: The game was quit
 public enum GameResult
 {
     HitWall,
